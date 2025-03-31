@@ -230,8 +230,9 @@ namespace Game
 
         static void ProcessTrain(object trainName)
         {
-            semaphore.WaitOne();
+            
             Console.WriteLine($"[{trainName}] Чекає на вільну колонку");
+            semaphore.WaitOne();
             int a = random.Next(3000, 7000);
             Console.WriteLine($"[{trainName}] Заправляється ({a/1000, 0} сек)...");
             Thread.Sleep(a);
@@ -283,8 +284,6 @@ namespace Game
                 Thread trainThread = new Thread(ProcessTrain);
                 trainThread.Start($"Авто {i+1, 2}");
             }
-
-
         }
     }
 }
