@@ -210,10 +210,52 @@ namespace Game
             semaphore.Wait();
             Console.WriteLine($"[{trainName}] Чекає на вхід");
             int a = random.Next(3000, 7000);
-            Console.WriteLine($"[{trainName}] Зайшов на стадіон (чекати {a/1000, 0} секунд)...");
+            Console.WriteLine($"[{trainName}] Зайшов на стадіон (чекати {a / 1000,0} секунд)...");
             Thread.Sleep(a);
             Console.WriteLine($"[{trainName}] Вийшов з стадіону");
             semaphore.Release();
+        }
+
+        static void MultiplicationTable(int num)
+        {
+            Parallel.For(0, num + 1, i =>
+            {
+                Console.WriteLine($"[{num}] {num} × {i} = {num * i}");
+            });
+        }
+
+        static int sum(List<int> list)
+        {
+            int sum = 0;
+            for (int i = 0; i < list.Count(); i++)
+                sum += list[i];
+            return sum;
+        }
+
+        static double avg(List<int> list)
+        {
+            int sum = 0;
+            for (int i = 0; i < list.Count(); i++)
+                sum += list[i];
+            return sum / list.Count();
+        }
+
+        static int min(List<int> list)
+        {
+            int min = list[0];
+            for (int i = 0; i < list.Count();i++)
+                if (list[i] < min)
+                    min = list[i];
+            return min;
+        }
+
+        static int max(List<int> list)
+        {
+            int max = list[0];
+            for (int i = 0; i < list.Count(); i++)
+                if (list[i] > max)
+                    max = list[i];
+            return max;
         }
 
         public static void Main(string[] args)
@@ -221,15 +263,56 @@ namespace Game
             Console.OutputEncoding = UTF8Encoding.UTF8;
             Console.InputEncoding = UTF8Encoding.UTF8;
 
-            Thread _ = new Thread(() => { while (true) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"залишилось {semaphore.CurrentCount} місць"); Console.ResetColor(); Thread.Sleep(10000); } });
+            /*Thread _ = new Thread(() => { while (true) { Console.ForegroundColor = ConsoleColor.Red; Console.WriteLine($"залишилось {semaphore.CurrentCount} місць"); Console.ResetColor(); Thread.Sleep(10000); } });
             _.Start();
 
             for (int i = 0; i < 1025; i++)
             {
-                Thread trainThread = new Thread(Process);
-                trainThread.Start($"Людина {i + 1,2}");
-                Thread.Sleep(1000);
-            }
+                thread trainthread = new thread(process);
+                trainthread.start($"людина {i + 1,2}");
+                thread.sleep(1000);
+            }*/
+
+            //Parallel.For(0, 11, i =>
+            //{
+            //    MultiplicationTable(i);
+            //    Thread.Sleep(200);
+            //});
+
+            List<int> list = new List<int>();
+
+            for(int i = 0;i < 1000000;i++)
+                list.Add(random.Next(0,1000000));
+            Parallel.Invoke(
+                () =>
+                {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    var _ = sum(list);
+                    stopwatch.Stop();
+                    Console.WriteLine($"sum = {_} for {stopwatch.ElapsedMilliseconds} ms");
+                },
+                () =>
+                {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    var _ = avg(list);
+                    stopwatch.Stop();
+                    Console.WriteLine($"avg = {_} for {stopwatch.ElapsedMilliseconds} ms");
+                },
+                () =>
+                {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    var _ = min(list);
+                    stopwatch.Stop();
+                    Console.WriteLine($"min = {_} for {stopwatch.ElapsedMilliseconds} ms");
+                },
+                () =>
+                {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    var _ = max(list);
+                    stopwatch.Stop();
+                    Console.WriteLine($"max = {_} for {stopwatch.ElapsedMilliseconds} ms");
+                }
+            );
         }
     }
 }
