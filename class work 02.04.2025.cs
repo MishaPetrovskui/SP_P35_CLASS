@@ -234,7 +234,7 @@ namespace Game
 
         static double avg(List<int> list)
         {
-            int sum = 0;
+            double sum = 0;
             for (int i = 0; i < list.Count(); i++)
                 sum += list[i];
             return sum / list.Count();
@@ -281,8 +281,9 @@ namespace Game
 
             List<int> list = new List<int>();
 
-            for(int i = 0;i < 1000000;i++)
-                list.Add(random.Next(0,1000000));
+            for(int i = 0;i < 100000000;i++)
+                list.Add(random.Next(0,100000000));
+            Stopwatch stopwatch1 = Stopwatch.StartNew();
             Parallel.Invoke(
                 () =>
                 {
@@ -313,6 +314,8 @@ namespace Game
                     Console.WriteLine($"max = {_} for {stopwatch.ElapsedMilliseconds} ms");
                 }
             );
+            stopwatch1.Stop();
+            Console.WriteLine($"full for {stopwatch1.ElapsedMilliseconds} ms");
         }
     }
 }
