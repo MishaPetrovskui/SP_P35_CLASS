@@ -28,7 +28,9 @@ namespace SP_P35
             lock (LockConsole)
                 lock (LockMessages)
                 {
-                    for (int i = 0; i < messages.Count; i++)
+                    
+                    int i = 0;
+                    foreach (var s in messages)
                     {
                         Console.SetCursorPosition(42, i);
                         Console.Write(messages[i]);
@@ -40,7 +42,7 @@ namespace SP_P35
         {
             lock (LockMessages)
             {
-                if (messages.Count < 10)
+                if (messages.Count < 20)
                     messages.Add(message);
             }
         }
@@ -79,17 +81,35 @@ namespace SP_P35
             }
         }
 
+        static Semaphore semaphore = new Semaphore(3, 3);
 
+        static void ProcessTrain(int num)
+        {
+            semaphore.WaitOne();
+            AddMessage($"[N{num + 1}] Чекає на вільну колонку");
+            int a = random.Next(3000, 7000);
+            AddMessage($"[N{num + 1}] Заправляється ({a / 1000,0} сек)...");
+            Thread.Sleep(a);
+            AddMessage($"[N {num + 1}] Заправку завершено");
+            semaphore.Release();
+        }
+
+        public static void start(int num)
+        {
+            Parallel.For(0, num, i => { ProcessTrain(i); });
+        }
 
         public static void Main(string[] args)
         {
+            Console.OutputEncoding = UTF8Encoding.UTF8;
+            Console.InputEncoding = UTF8Encoding.UTF8;
             IntPtr consoleWindow = GetConsoleWindow();
             ShowWindow(consoleWindow, 3);
             Console.CursorVisible = false;
-            List<string> actions = new List<string> { "Print \"Hello!\"", "Action 1", "Action 2", "Action 3", "Exit" };
+            List<string> actions = new List<string> { "Print \"Hello!\"", "Add 1 car", "Add 5 cars", "Add 10 cars", "Exit" };
             Console.BackgroundColor = ConsoleColor.Blue;
             Console.Clear();
-
+            int num = 1;
             Parallel.Invoke(
                 () =>
                 {
@@ -98,9 +118,12 @@ namespace SP_P35
                         switch (Menu(actions))
                         {
                             case 0: { AddMessage("Hello!"); break; }
-                            case 1: { Menu(new string[] { "Back", "Another back" }); break; }
-                            case 2: { Menu(new string[] { "Back", "Another back" }); break; }
-                            case 3: { Menu(new string[] { "Back", "Another back" }); break; }
+                            case 1: { num++; Thread trainThread = new Thread(() => start(num));
+                                    trainThread.Start(); break; }
+                            case 2: { num = num+5; Thread trainThread = new Thread(() => start(num));
+                                trainThread.Start(); break; }
+                            case 3: { num = num + 10; Thread trainThread = new Thread(() => start(num));
+                                    trainThread.Start(); break; }
                             case 4: { Environment.Exit(0); break; }
                         }
                     }
