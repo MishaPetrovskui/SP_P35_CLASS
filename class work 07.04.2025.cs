@@ -30,10 +30,10 @@ namespace SP_P35
                 {
                     
                     int i = 0;
-                    foreach (var s in messages)
+                    foreach (var lll in messages)
                     {
-                        Console.SetCursorPosition(42, i);
-                        Console.Write(messages[i]);
+                        Console.SetCursorPosition(42, i++);
+                        Console.Write(lll);
                     }
                 }
         }
@@ -42,8 +42,12 @@ namespace SP_P35
         {
             lock (LockMessages)
             {
-                if (messages.Count < 20)
+                if (messages.Count() < 20)
                     messages.Add(message);
+                else
+                {
+                    messages.Remove(messages[0]); Console.Clear();
+                }
             }
         }
 
@@ -74,7 +78,7 @@ namespace SP_P35
                     else if (key == ConsoleKey.DownArrow) active = Math.Min(active + 1, item.Count() - 1);
                     else if (key == ConsoleKey.Enter)
                     {
-                        Console.Clear(); return active;
+                        return active;
                     }
                 }
                 Thread.Sleep(100);
